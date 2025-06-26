@@ -13,6 +13,7 @@ ss * Created on 21 de Junho de 2018, 12:47
  */
 
 #include "../../source/applications/TraitsApp.h"
+#include "../../source/applications/terminal/TraitsTerminalApp.h"
 
 /*!
  * This is the MAIN application of GenESyS. It just calls the Application specificied on the configuration/traits file.
@@ -20,7 +21,7 @@ ss * Created on 21 de Junho de 2018, 12:47
  */
 int main(int argc, char** argv) {  
 	// do not change it. Set you own application in Traits file => TraitsApp<GenesysApplication_if>::Application
-	GenesysApplication_if *app = new TraitsApp<GenesysApplication_if>::Application();
+	GenesysApplication_if *app = new TraitsTerminalApp<GenesysApplication_if>::Application();
 	int res = app->main(argc, argv);
 	return res;
 }

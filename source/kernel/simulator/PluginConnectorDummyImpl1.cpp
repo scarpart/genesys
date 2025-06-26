@@ -160,8 +160,8 @@ Plugin* PluginConnectorDummyImpl1::connect(const std::string dynamicLibraryFilen
 		GetInfo = &Access::GetPluginInformation;
 	else if (fn == "batch.so")
 		GetInfo = &Batch::GetPluginInformation;
-	else if (fn == "cellularautomata.so")
-		GetInfo = &CellularAutomataComp::GetPluginInformation;
+	// else if (fn == "cellularautomata.so")
+	// 	GetInfo = &CellularAutomataComp::GetPluginInformation;
 	else if (fn == "clone.so")
 		GetInfo = &Clone::GetPluginInformation;
 	else if (fn == "create.so")
