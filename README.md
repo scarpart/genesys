@@ -44,6 +44,7 @@ Dessa forma, basta:
 - Incluí-los na definição da sua aplicação em `source/applications/terminal/examples/smarts/`. A sua aplicação **poderia** ser algo diferente de um smart, mas eu não sei o suficiente sobre isso pra descrever como seria qualquer outra possibilidade ¯\\\_(ツ)\_/¯
 - Alterar `source/applications/terminal/TraitsTerminalApp.h` para utilizar o seu Smart em vez do Smart_SeizeDelayRelease
 - Compilar o projeto com `make -C projects/GenesysTerminalApplication`
+- Incluir o seu plugin na lista de plugins necessários em `/autoloadplugins.txt`
 - Executar com
 ```bash
 cd projects/GenesysTerminalApplication/dist && ./genesysterminalapplication
