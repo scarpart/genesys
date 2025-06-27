@@ -83,6 +83,9 @@
 //#include "../../plugins/data/Conveyor.h"
 //#include "../../plugins/data/Segment.h"
 
+// TRABALHO
+#include "../../plugins/components/Trabalho.h"
+
 #include "../util/Util.h"
 
 //namespace GenesysKernel {
@@ -276,6 +279,8 @@ Plugin* PluginConnectorDummyImpl1::connect(const std::string dynamicLibraryFilen
 		GetInfo = &Unstore::GetPluginInformation;
 	else if (fn == "write.so")
 		GetInfo = &Write::GetPluginInformation;
+	else if (fn == "trabalho.so")
+		GetInfo = &Trabalho::GetPluginInformation;
 	//else if (fn == "octave.so")
 	//	GetInfo = &Octave::GetPluginInformation;
 

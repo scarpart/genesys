@@ -110,6 +110,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/296208d5/Smart_SimulationControlResponse.o \
 	${OBJECTDIR}/_ext/296208d5/Smart_WaitScanCondition.o \
 	${OBJECTDIR}/_ext/296208d5/Smart_WaitSignal.o \
+	${OBJECTDIR}/_ext/296208d5/Smart_Trabalho.o \
 	${OBJECTDIR}/_ext/18d98d98/AnElectronicAssemblyAndTestSystem.o \
 	${OBJECTDIR}/_ext/18d98d98/FullSimulationOfComplexModel.o \
 	${OBJECTDIR}/_ext/18d98d98/OperatingSystem02.o \
@@ -211,6 +212,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/f13e5db9/Unstore.o \
 	${OBJECTDIR}/_ext/f13e5db9/Wait.o \
 	${OBJECTDIR}/_ext/f13e5db9/Write.o \
+	${OBJECTDIR}/_ext/f13e5db9/Trabalho.o \
 	${OBJECTDIR}/_ext/ccae408d/AssignmentItem.o \
 	${OBJECTDIR}/_ext/ccae408d/CppCompiler.o \
 	${OBJECTDIR}/_ext/ccae408d/DummyElement.o \
@@ -271,6 +273,39 @@ LDLIBSOPTIONS=
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/genesysterminalapplication: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/genesysterminalapplication ${OBJECTFILES} ${LDLIBSOPTIONS}
+
+${OBJECTDIR}/_ext/296208d5/Smart_Trabalho.o: ../../source/applications/terminal/examples/smarts/Smart_Trabalho.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext
+	$(COMPILE.cc) -g -I../../source/gtest -std=c++14 -o ${OBJECTDIR}/_ext/296208d5/Smart_Trabalho.o ../../source/applications/terminal/examples/smarts/Smart_Trabalho.cpp
+
+${OBJECTDIR}/_ext/296208d5/Smart_Trabalho_nomain.o: ${OBJECTDIR}/_ext/296208d5/Smart_Trabalho.o ../../source/applications/terminal/examples/smarts/Smart_Trabalho.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/296208d5
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/_ext/296208d5/Smart_Trabalho.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    $(COMPILE.cc) -g -I../../source/gtest -std=c++14 -Dmain=__nomain -o ${OBJECTDIR}/_ext/296208d5/Smart_Trabalho_nomain.o ../../source/applications/terminal/examples/smarts/Smart_Trabalho.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/_ext/296208d5/Smart_Trabalho.o ${OBJECTDIR}/_ext/296208d5/Smart_Trabalho_nomain.o;\
+	fi
+
+# Compilar Plugin
+${OBJECTDIR}/_ext/f13e5db9/Trabalho.o: ../../source/plugins/components/Trabalho.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext
+	$(COMPILE.cc) -g -I../../source/gtest -std=c++14 -o ${OBJECTDIR}/_ext/f13e5db9/Trabalho.o ../../source/plugins/components/Trabalho.cpp
+
+${OBJECTDIR}/_ext/f13e5db9/Trabalho_nomain.o: ${OBJECTDIR}/_ext/f13e5db9/Trabalho.o ../../source/plugins/components/Trabalho.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/f13e5db9
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/_ext/f13e5db9/Trabalho.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    $(COMPILE.cc) -g -I../../source/gtest -std=c++14 -Dmain=__nomain -o ${OBJECTDIR}/_ext/f13e5db9/Trabalho_nomain.o ../../source/plugins/components/Trabalho.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/_ext/f13e5db9/Trabalho.o ${OBJECTDIR}/_ext/f13e5db9/Trabalho_nomain.o;\
+	fi
 
 ${OBJECTDIR}/_ext/6bf258f7/BaseGenesysTerminalApplication.o: ../../source/applications/BaseGenesysTerminalApplication.cpp nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}/_ext/6bf258f7

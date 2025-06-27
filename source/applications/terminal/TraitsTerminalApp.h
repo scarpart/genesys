@@ -14,7 +14,7 @@
 #pragma once
 
 #include "GenesysShell/GenesysShell.h"
-#include "examples/smarts/Smart_SeizeDelayRelease.h"
+#include "examples/smarts/Smart_Trabalho.h"
 
 template <typename T>
 struct TraitsTerminalApp {
@@ -55,7 +55,7 @@ template <> struct TraitsTerminalApp<GenesysApplication_if> {
 	//typedef Smart_ProcessSet Application;
 	//typedef Smart_Record Application;
 	//typedef Smart_RouteStation Application;
-    typedef Smart_SeizeDelayRelease Application;
+    typedef Smart_Trabalho Application;
 	//typedef Smart_SeizeDelayReleaseNoDataDefs Application;
 	//typedef Smart_SeizeDelayReleaseMany Application;
 	//typedef Smart_Sequence Application;
