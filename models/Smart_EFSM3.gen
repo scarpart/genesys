@@ -1,0 +1,30 @@
+# Genesys Simulation Model
+# Simulator, Model and Simulation infos
+0   Simulator  "GenESyS - GENeric and Expansible SYstem Simulator" versionNumber=230914 
+0   ModelInfo  "Model 1" version="1.0" projectTitle="" description="" analystName="" 
+0   ModelSimulation "" traceLevel=9 replicationLength=30.000000 
+
+# Model Data Definitions
+84  EntityType "TestEntity" 
+88  ExtendedFSM "parallel_efsm" 
+89  Variable   "path1Count" valuePos[0]="path1Count" values=1 
+90  Variable   "path2Count" valuePos[0]="path2Count" values=1 
+91  Variable   "path3Count" valuePos[0]="path3Count" values=1 
+
+# Model Components
+85  Create     "Create_1" entityType="TestEntity" maxCreations="3" nextId=86 caption="Create Test Entity" timeBetweenCreations="5" 
+86  Assign     "Assign_1" assignExpr[0]="1" nextId=87 caption="Set trigger value" assignDest[0]="trigger" 
+87  Delay      "Delay_1" delayExpression="0.1" nextId=103 caption="Initial delay" 
+92  FSM_State  "Initial" 
+93  FSM_State  "StateA" 
+94  FSM_State  "StateB" 
+95  FSM_State  "StateC" 
+96  FSM_State  "Final" 
+97  FSM_Transition "ToStateA" 
+98  FSM_Transition "ToStateB" 
+99  FSM_Transition "ToStateC" 
+100 FSM_Transition "AtoFinal" 
+101 FSM_Transition "BtoFinal" 
+102 FSM_Transition "CtoFinal" 
+103 FSM_ModalModel "parallel_modal" 
+104 Dispose    "Dispose_1" nexts=0 

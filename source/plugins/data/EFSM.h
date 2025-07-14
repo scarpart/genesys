@@ -36,21 +36,28 @@ public: /// new public user methods for this component
     std::vector<Variable*>* getVariables() {
          return _variables;
     }
+    void enableParallelism(bool on) {
+		_parallelismEnabled = on;	 
+	}
+	bool isParallelEnabled() const { return _parallelismEnabled; }
+	bool hasReturnedToComponent() const { return _returnedToComponent; }
 
     std::string getCurrentState();
 
     void setInitialState(FSM_State* state);
+	void updateCurrentStates(FSM_State* oldState, std::vector<FSM_State*> newStates);
     
     void insertVariable(Variable* variable);
     void enterEFSM(Entity* entity, ModelComponent* returnState);
     void leaveEFSM(Entity* entity, FSM_State* newCurrentState);
     void reset();
- 
-private:
-    void setCurrentState(FSM_State* state);
 
 public: /// virtual public methods
     virtual std::string show();
+	// NOTE this should really not be public, but only accessible through FSM_State.
+	// Due to lack of time, I am setting it here, though
+	// A better alternative would perhaps be composition using Friend Classes
+    void setCurrentState(FSM_State* state);
 
 public: /// static public methods that must have implementations (Load and New just the same. GetInformation must provide specific infos for the new component
     static PluginInformation* GetPluginInformation();
@@ -72,7 +79,10 @@ private:
     std::vector<ModelComponent*>* _returnModels = new std::vector<ModelComponent*>();
 
     FSM_State* _initialState;
-    FSM_State* _currentState;
+	std::vector<FSM_State*> _currentStates;
+
+	bool _parallelismEnabled = false;
+	bool _returnedToComponent = false;
 };
 
 #endif /* EFSM_H */

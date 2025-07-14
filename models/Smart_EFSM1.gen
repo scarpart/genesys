@@ -1,0 +1,21 @@
+# Genesys Simulation Model
+# Simulator, Model and Simulation infos
+0   Simulator  "GenESyS - GENeric and Expansible SYstem Simulator" versionNumber=230914 
+0   ModelInfo  "Model 1" version="1.0" projectTitle="" description="" analystName="" 
+0   ModelSimulation "" traceLevel=9 replicationBaseTimeUnit=7 replicationLength=10.000000 numberOfReplications=3 replicationLengthTimeUnit=6 
+
+# Model Data Definitions
+84  EntityType "Person" 
+88  ExtendedFSM "efsm_1" 
+89  Variable   "carsParked" valuePos[0]="carsParked" values=1 
+
+# Model Components
+85  Create     "Create_1" entityType="Person" timeBetweenCreationsTimeUnit=6 nextId=86 caption="Enter Garage" timeBetweenCreations="1" 
+86  Assign     "Assign_1" assignExpr[0]="1" nextId=87 caption="Verify if has car" assignDest[0]="hasCar" 
+87  Delay      "Delay_1" delayExpression="10" nextId=94 caption="Browse" 
+90  FSM_State  "state_1" 
+91  FSM_Transition "transition_1" 
+92  FSM_Transition "transition_2" 
+93  FSM_Transition "transition_3" 
+94  FSM_ModalModel "modalmodel_1" 
+95  Dispose    "Dispose_1" nexts=0 

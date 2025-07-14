@@ -1,4 +1,7 @@
 #include <stdexcept>
+#include <random>
+#include <vector>
+#include <set>
 #include "FSM_State.h"
 
 ModelDataDefinition* FSM_State::NewInstance(Model* model, std::string name) {
@@ -73,6 +76,17 @@ ExtendedFSM* FSM_State::getRefinement() {
 
 void FSM_State::fire(Entity* entity) {
     auto connections = this->getConnections()->connections();
+	if (connections->empty() && !_efsm->hasReturnedToComponent()) { // TODO check this
+        // This is likely a final state with no outgoing transitions
+        _efsm->leaveEFSM(entity, this);
+        return;
+    }
+
+	if (_efsm->hasReturnedToComponent()) {
+		// Already reached a final state in some other branch - nothing to do
+		return;
+	}
+
     auto transitionChosen = dynamic_cast<FSM_Transition*>(connections->begin()->second->component);
     auto transitionDefault = transitionChosen;
 
@@ -80,6 +94,8 @@ void FSM_State::fire(Entity* entity) {
     auto totalEnableds = 0;
     auto deterministicEnabled = false;
     auto nonDefaultEnabled = false;
+
+	std::vector<FSM_Transition*> possibleTransitions;
 
     for(auto connection: *connections) {
         auto transition = dynamic_cast<FSM_Transition*>(connection.second->component);
@@ -101,11 +117,19 @@ void FSM_State::fire(Entity* entity) {
                     transitionChosen = transition;
                 }
             } else {
+				// On each iteration, add the transitionChosen to the vector of possible
+				// transitions, to be picked at random later
                 nonDefaultEnabled = true;
-                transitionChosen = transition;
+				possibleTransitions.push_back(transition);
             }
         }
     }
+
+	traceSimulation(this, TraceManager::Level::L5_event,
+			">> S.fire: totalEnableds=" + std::to_string(totalEnableds)
+			+ " nondet=" + std::to_string(possibleTransitions.size())
+			+ " detEnabled=" + (deterministicEnabled ? "Y":"N")
+			);
 
     if (deterministicEnabled and totalEnableds > 1) {
         throw std::domain_error("More than a transition and at least one is deterministic.");
@@ -114,6 +138,55 @@ void FSM_State::fire(Entity* entity) {
     if (totalEnableds == 0) {
         transitionChosen = transitionDefault;
     }
+
+	if (_efsm && _efsm->isParallelEnabled() && !possibleTransitions.empty()) {
+		traceSimulation(this, TraceManager::Level::L5_event,
+				"  -- parallel branch: firing "
+				+ std::to_string(possibleTransitions.size())
+				+ " transitions"
+				);
+
+        std::set<FSM_State*> targetStates;
+        std::vector<std::pair<FSM_Transition*, FSM_State*>> validTransitions;
+
+        for (auto* tr : possibleTransitions) {
+            if (!tr) continue;
+
+			traceSimulation(this, TraceManager::Level::L5_event, " -> About to fire " + tr->getName());
+
+            auto conns = tr->getConnections()->connections();
+            if (conns->empty()) continue;
+
+            FSM_State* dest = dynamic_cast<FSM_State*>(conns->begin()->second->component);
+            if (!dest) continue;
+            
+            if (targetStates.find(dest) == targetStates.end()) {
+                targetStates.insert(dest);
+                validTransitions.push_back(std::make_pair(tr, dest));
+            }
+        }
+
+		std::vector<FSM_State*> newStates;
+        for (auto& transitionPair : validTransitions) {
+            auto* tr = transitionPair.first; 
+            if (_refinement && !tr->isPreemptive()) {
+                _refinement->enterEFSM(entity, tr);
+            }
+            this->_parentModel->sendEntityToComponent(entity, tr);
+			newStates.push_back(transitionPair.second);
+            //_efsm->setCurrentState(dest);
+        }
+		_efsm->updateCurrentStates(this, newStates);
+        return;
+    }
+
+	// Pick a random transition, since we cannot go to all of them
+	if (!possibleTransitions.empty()) {
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_int_distribution<> dis(0, possibleTransitions.size() - 1);
+		transitionChosen = possibleTransitions[dis(gen)];
+	}
 
     if (_refinement != nullptr and not transitionChosen->isPreemptive()) {
         _refinement->enterEFSM(entity, transitionChosen);
@@ -124,59 +197,128 @@ void FSM_State::fire(Entity* entity) {
 
 void FSM_State::fireWithOnlyImmediate(Entity* entity) {
     auto connections = this->getConnections()->connections();
+
+    // If no outgoing transitions and not returned yet, treat as final state
+    if (connections->empty() && !_efsm->hasReturnedToComponent()) {
+        _efsm->leaveEFSM(entity, this);
+        return;
+    }
+
+    // If already returned via some branch, nothing to do
+    if (_efsm->hasReturnedToComponent()) {
+        return;
+    }
+
+    // Initialize chosen transition to first connection (fallback placeholder)
     auto transitionChosen = dynamic_cast<FSM_Transition*>(connections->begin()->second->component);
 
-    auto totalEnableds = 0;
-    auto deterministicEnabled = false;
-    auto nonDefaultEnabled = false;
+    // Track possible immediate transitions
+    std::vector<FSM_Transition*> possibleTransitions;
+    int totalEnableds = 0;
+    bool deterministicEnabled = false;
+    bool nonDefaultEnabled = false;
 
-    for(auto connection: *connections) {
+    for (auto connection : *connections) {
         auto transition = dynamic_cast<FSM_Transition*>(connection.second->component);
+        if (!transition->isImmediate() || !transition->isEnabled())
+            continue;
 
-        if (transition->isImmediate() and transition->isEnabled()) {
-            ++totalEnableds;
+        ++totalEnableds;
+        if (transition->isDeterministic()) {
+            deterministicEnabled = true;
+        }
 
-            if (transition->isDeterministic()) {
-                deterministicEnabled = true;
-            }
-
-            if (transition->isDefault()){
-                if (not nonDefaultEnabled) {
-                    transitionChosen = transition;
-                }
-            } else {
-                nonDefaultEnabled = true;
+        // Default transitions get chosen only if no non-default yet
+        if (transition->isDefault()) {
+            if (!nonDefaultEnabled) {
                 transitionChosen = transition;
             }
+        } else {
+            nonDefaultEnabled = true;
+            possibleTransitions.push_back(transition);
         }
     }
-    if (deterministicEnabled and totalEnableds > 1) {
+
+    traceSimulation(this, TraceManager::Level::L5_event,
+                    ">> S.fireWithOnlyImmediate: totalEnableds=" + std::to_string(totalEnableds)
+                    + " nondet=" + std::to_string(possibleTransitions.size())
+                    + " detEnabled=" + (deterministicEnabled ? "Y" : "N")
+    );
+
+    if (deterministicEnabled && totalEnableds > 1) {
         throw std::domain_error("More than a transition and at least one is deterministic.");
     }
 
-    if (totalEnableds > 0) {
-        if (_refinement != nullptr and not transitionChosen->isPreemptive()) {
-            _refinement->enterEFSM(entity, transitionChosen);
+    // If no immediate transitions available, exit EFSM
+    if (totalEnableds == 0) {
+        _efsm->leaveEFSM(entity, this);
+        return;
+    }
+
+    // Parallel branch firing: fire all unique-target transitions
+    if (_efsm && _efsm->isParallelEnabled() && !possibleTransitions.empty()) {
+        traceSimulation(this, TraceManager::Level::L5_event,
+                        "  -- parallel branch: firing "
+                        + std::to_string(possibleTransitions.size())
+        );
+
+        std::set<FSM_State*> targetStates;
+        std::vector<std::pair<FSM_Transition*, FSM_State*>> validTransitions;
+        for (auto* tr : possibleTransitions) {
+            if (!tr) continue;
+            traceSimulation(this, TraceManager::Level::L5_event, " -> About to fire " + tr->getName());
+
+            auto conns = tr->getConnections()->connections();
+            if (conns->empty()) continue;
+            auto dest = dynamic_cast<FSM_State*>(conns->begin()->second->component);
+            if (!dest) continue;
+            if (targetStates.insert(dest).second) {
+                validTransitions.emplace_back(tr, dest);
+            }
         }
 
-        this->_parentModel->sendEntityToComponent(entity, transitionChosen); 
-    } else {
-        _efsm->leaveEFSM(entity, this);
+        std::vector<FSM_State*> newStates;
+        for (auto& [tr, dest] : validTransitions) {
+            if (_refinement && !tr->isPreemptive()) {
+                _refinement->enterEFSM(entity, tr);
+            }
+            _parentModel->sendEntityToComponent(entity, tr);
+            newStates.push_back(dest);
+        }
+        _efsm->updateCurrentStates(this, newStates);
+        return;
     }
+
+    // Choose one at random if multiple
+    if (!possibleTransitions.empty()) {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dis(0, possibleTransitions.size() - 1);
+        transitionChosen = possibleTransitions[dis(gen)];
+    }
+
+    // Enter refinement if needed and send entity
+    if (_refinement && !transitionChosen->isPreemptive()) {
+        _refinement->enterEFSM(entity, transitionChosen);
+    }
+    _parentModel->sendEntityToComponent(entity, transitionChosen);
 }
 
 
 void FSM_State::_onDispatchEvent(Entity* entity, unsigned int inputPortNumber) {
-    if (_mustBeImmediate) {
-        _mustBeImmediate = false;
+	if (_mustBeImmediate) {
+		_mustBeImmediate = false;
 
-        if (isFinalState()) {
-            _efsm->leaveEFSM(entity, this);
-        }
+		if (isFinalState()) {
+			_efsm->leaveEFSM(entity, this);
+		}
 
-        fireWithOnlyImmediate(entity);
-    } else {
-        fire(entity);
-    }
+		fireWithOnlyImmediate(entity);
+	} else {
+		fire(entity);
+	}
 }
 
+bool FSM_State::isParallel() const {
+	return _efsm && _efsm->isParallelEnabled();
+}

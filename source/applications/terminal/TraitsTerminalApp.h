@@ -15,6 +15,9 @@
 
 #include "GenesysShell/GenesysShell.h"
 #include "examples/smarts/Smart_Trabalho.h"
+#include "examples/smarts/Smart_EFSM3.h"
+#include "examples/smarts/Smart_EFSM2.h"
+#include "examples/smarts/Smart_EFSM1.h"
 
 template <typename T>
 struct TraitsTerminalApp {
@@ -41,6 +44,7 @@ template <> struct TraitsTerminalApp<GenesysApplication_if> {
 	//typedef Smart_Dummy Application;
 	//typedef Smart_EFSM1 Application;
     //typedef Smart_EFSM2 Application;
+    typedef Smart_EFSM3 Application;
 	//typedef Smart_Failures Application;
 	//typedef Smart_FiniteStateMachine Application;
 	//typedef Smart_HoldSearchRemove Application;
@@ -55,7 +59,7 @@ template <> struct TraitsTerminalApp<GenesysApplication_if> {
 	//typedef Smart_ProcessSet Application;
 	//typedef Smart_Record Application;
 	//typedef Smart_RouteStation Application;
-    typedef Smart_Trabalho Application;
+    //typedef Smart_Trabalho Application;
 	//typedef Smart_SeizeDelayReleaseNoDataDefs Application;
 	//typedef Smart_SeizeDelayReleaseMany Application;
 	//typedef Smart_Sequence Application;

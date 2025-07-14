@@ -31,6 +31,10 @@ void Trabalho::setAllocation(Util::AllocationType allocation) {
 	_allocation = allocation;
 }
 
+void Trabalho::setTrabalhoTimeUnit(Util::TimeUnit _delayTimeUnit) {
+	this->_delayTimeUnit = _delayTimeUnit;
+}
+
 Util::AllocationType Trabalho::getAllocation() const {
 	return _allocation;
 }
@@ -88,10 +92,6 @@ void Trabalho::setTrabalhoExpression(std::string _delayExpression, Util::TimeUni
 
 std::string Trabalho::trabalhoExpression() const {
 	return  _delayExpression;
-}
-
-void Trabalho::setTrabalhoTimeUnit(Util::TimeUnit _delayTimeUnit) {
-	this->_delayTimeUnit = _delayTimeUnit;
 }
 
 Util::TimeUnit Trabalho::delayTimeUnit() const {

@@ -65,6 +65,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/577f3b86/Smart_Expression.o \
 	${OBJECTDIR}/_ext/296208d5/Smart_EFSM1.o \
 	${OBJECTDIR}/_ext/296208d5/Smart_EFSM2.o \
+	${OBJECTDIR}/_ext/296208d5/Smart_EFSM3.o \
 	${OBJECTDIR}/_ext/577f3b86/Smart_InventoryAndHoldingCosts.o \
 	${OBJECTDIR}/_ext/577f3b86/Smart_MaxArrivalsField.o \
 	${OBJECTDIR}/_ext/577f3b86/Smart_ModelRunUntil1000Parts.o \
@@ -438,6 +439,10 @@ ${OBJECTDIR}/_ext/296208d5/Smart_EFSM1.o: ../../source/applications/terminal/exa
 ${OBJECTDIR}/_ext/296208d5/Smart_EFSM2.o: ../../source/applications/terminal/examples/smarts/Smart_EFSM2.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/296208d5
 	$(COMPILE.cc) -g -I../../source/gtest -std=c++14 -o ${OBJECTDIR}/_ext/296208d5/Smart_EFSM2.o ../../source/applications/terminal/examples/smarts/Smart_EFSM2.cpp
+
+${OBJECTDIR}/_ext/296208d5/Smart_EFSM3.o: ../../source/applications/terminal/examples/smarts/Smart_EFSM3.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/296208d5
+	$(COMPILE.cc) -g -I../../source/gtest -std=c++14 -o ${OBJECTDIR}/_ext/296208d5/Smart_EFSM3.o ../../source/applications/terminal/examples/smarts/Smart_EFSM3.cpp
 
 ${OBJECTDIR}/_ext/577f3b86/Smart_InventoryAndHoldingCosts.o: ../../source/applications/terminal/examples/arenaSmarts/Smart_InventoryAndHoldingCosts.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/577f3b86

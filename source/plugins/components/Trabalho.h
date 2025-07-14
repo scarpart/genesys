@@ -41,7 +41,9 @@ public:
 	virtual ~Trabalho() = default;
 public:
 	//void setDelayExpression(std::string _delayExpression);
+	void setTrabalho(double trabalho);
 	void setTrabalhoExpression(std::string _delayExpression, Util::TimeUnit _delayTimeUnit=Util::TimeUnit::unknown);
+	void setTrabalhoTimeUnit(Util::TimeUnit _timeUnit);
 	std::string trabalhoExpression() const;
 	void setDelay(double delay);
 	double delay() const;

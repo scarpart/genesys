@@ -63,5 +63,6 @@ private:
     bool _mustBeImmediate = false;
     ExtendedFSM* _refinement = nullptr;
     ExtendedFSM* _efsm = nullptr;
+	bool isParallel() const;
 };
 #endif /* FSM_STATE_H */
